@@ -4,7 +4,7 @@ DRIVE IN A CIRCLE
     drive_square.py is a script that makes the turtlebot drive in a square indefinitely. To do this, I used a timing method, sending Twist signals to the turtlebot to move forward then stop, followed by Twist signals to turn in place 90 degrees, and then this is repeated. 
 
     This script was created with a class object (DriveSquare). __init__(self) intializes the drive_square node and the publisher that publishes the twist command is also initialized. run(self) senpublishesds the messages identifintely on two 5 second loops, one that commands the turtlebot to drive forward and the other for it to turn in place. The rospy.rate is set to 5Hz and the linear.x and angular.z values were adjusted to get the turtlebot to drive in as much of square as possible. 
-    ![]drive_square.gif
+    ![]https://github.com/nickauen/warmup_project/blob/bb15c87dde875a863882d16a7b6b1a08bc0d0997/drive_square.gif
 
     A high-level description (a few sentences): Describe the problem and your approach at a high-level. Include any relevant diagrams or pictures that help to explain your approach.
     Code explanation (a couple of sentences per function): Describe the structure of your code. For the functions you wrote, describe what each of them does.
