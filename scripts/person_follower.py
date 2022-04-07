@@ -33,6 +33,7 @@ class Follow(object):
 
 
         low_value = None
+        
         index = 0
         for x in data.ranges:
             index += 1
@@ -45,29 +46,22 @@ class Follow(object):
         data.ranges[0] + data.ranges[1] + data.ranges[2] + data.ranges[3] + data.ranges[4])/10
         
         
-        
         if ((current_orientation > 0) and (current_orientation <= 180)):
             angular_speed = angular_constant*current_orientation/2
-            #cmd.linear.x = 0.25
+            linear_speed = 0.25
 
         if ((current_orientation < 359) and (current_orientation > 180)):
             angular_speed = angular_constant*current_orientation/2*-1
-            #cmd.linear.x = 0.25
+            linear_speed = 0.25
 
         if ((current_orientation > 90) and (current_orientation < 270)):
-            cmd.linear.x = 0.0
-            cmd.angular.z = angular_speed
+            linear_speed = 0.0
         
-        else:
-            if((distance > 9) or (distance <= goal_distance)):
-                cmd.linear.x = 0.0
-            
-            else:
-                cmd.linear.x = 0.25
-        cmd.linear.x = 
+        if((distance > 9) or (distance <= goal_distance)):
+            linear_speed = 0.0
+
+        cmd.linear.x = linear_speed
         cmd.angular.z = angular_speed
-
-
 
 
         self.follow_thing_pub.publish(cmd)
