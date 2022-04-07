@@ -24,10 +24,11 @@ class Follow_Wall(object):
         rospy.sleep(1)
 
     def process_scan(self, data):
-        goal_orientation = 45
+        goal_orientation = 90
         linear_speed = 0
         angular_speed = 0
-        goal_distance = 0.5
+        angular_variable = 0
+        goal_distance = 1
         cmd = Twist()
 
         low_value = None
@@ -39,8 +40,35 @@ class Follow_Wall(object):
                 
                 current_orientation = index
         
-        distance = (data.ranges[50] + data.ranges[49] + data.ranges[48] + data.ranges[47] + data.ranges[46] + 
+        side_distance = (data.ranges[50] + data.ranges[49] + data.ranges[48] + data.ranges[47] + data.ranges[46] + 
         data.ranges[45] + data.ranges[44] + data.ranges[43] + data.ranges[42] + data.ranges[41])/10
 
-        if (distance <= goal_distance):
+        front_distance = (data.ranges[355] + data.ranges[356] + data.ranges[357] + data.ranges[358] + data.ranges[359] + 
+        data.ranges[0] + data.ranges[1] + data.ranges[2] + data.ranges[3] + data.ranges[4])/10
+        linear_speed = 0.2
+
+        if (front_distance <= goal_distance):
             
+            linear_speed = 0
+            if ((current_orientation > 270) and (current_orientation < 85)):
+                angular_variable = 1
+            
+            else:
+                angular_variable = -1
+            
+        
+        if (side_distance < goal_distance):
+            linear_speed = .2
+            angular_speed = 1
+
+        angular_speed = 0.25*angular_variable
+        cmd.linear.x = linear_speed
+        cmd.angular.z = angular_speed
+
+        self.follow_wall_pub.publish(cmd)
+    def run(self):
+        rospy.spin()
+
+if __name__ == '__main__':
+    node = Follow_Wall()
+    node.run()
