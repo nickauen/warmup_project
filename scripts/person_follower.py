@@ -1,8 +1,11 @@
 """ This script publishes ROS messages to make a turtlebot follow the closest thing to it """
 #!/usr/bin/env python3
 
+from math import dist
+from multiprocessing.dummy import current_process
 from operator import indexOf
 import rospy
+import numpy
 
 from geometry_msgs.msg import Twist, Vector3
 from sensor_msgs.msg import LaserScan
@@ -21,6 +24,11 @@ class Follow(object):
         rospy.sleep(1)
 
     def process_scan(self, data):
+        goal_orientation = 0
+        angular_constant = .01
+        goal_distance = 0.5
+        angular_speed = 0
+        linear_speed = 0
         cmd = Twist()
 
 
@@ -31,23 +39,35 @@ class Follow(object):
             if (low_value == None or x < low_value):
                 low_value = x
                 
-                holdvalue = index
-        if (holdvalue < 90):
-            print("front")  # Directly in front
+                current_orientation = index
+        
+        distance = (data.ranges[355] + data.ranges[356] + data.ranges[357] + data.ranges[358] + data.ranges[359] + 
+        data.ranges[0] + data.ranges[1] + data.ranges[2] + data.ranges[3] + data.ranges[4])/10
+        
+        
+        
+        if ((current_orientation > 0) and (current_orientation <= 180)):
+            angular_speed = angular_constant*current_orientation/2
+            #cmd.linear.x = 0.25
+
+        if ((current_orientation < 359) and (current_orientation > 180)):
+            angular_speed = angular_constant*current_orientation/2*-1
+            #cmd.linear.x = 0.25
+
+        if ((current_orientation > 90) and (current_orientation < 270)):
             cmd.linear.x = 0.0
-            cmd.angular.z = 0.0
+            cmd.angular.z = angular_speed
+        
+        else:
+            if((distance > 9) or (distance <= goal_distance)):
+                cmd.linear.x = 0.0
+            
+            else:
+                cmd.linear.x = 0.25
+        cmd.linear.x = 
+        cmd.angular.z = angular_speed
 
-        if ((holdvalue >= 90) and (holdvalue < 180)):
-            print("left") # Directly to the left
-            cmd.angular.z = 0.0
 
-        if((holdvalue >=180) and (holdvalue < 270)):
-            print("behind") # Directly behind
-            cmd.linear.x = 0.0
-            cmd.angular.z = .25
-
-        if((holdvalue >= 270)):
-            print("right") # Directly to the right
 
 
         self.follow_thing_pub.publish(cmd)
