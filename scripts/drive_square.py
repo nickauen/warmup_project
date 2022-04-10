@@ -20,13 +20,13 @@ class DriveSquare(object):
         r = rospy.Rate(5.0) # 5Hz
         while not rospy.is_shutdown():
             cmd = Twist()
-            cmd.linear.x = 0.21 # Sets forward movement vector
+            cmd.linear.x = 0.13 # Sets forward movement vector
             for i in range(5): # Iterates 5 times
                 self.drive_square_pub.publish(cmd)
                 rospy.sleep(1)
 
             cmd = Twist()
-            cmd.angular.z = 0.315 # Sets angular (spinning) movement vector
+            cmd.angular.z = 0.35 # Sets angular (spinning) movement vector
             for i in range(5): # Iterates 5 times
                 self.drive_square_pub.publish(cmd)
                 rospy.sleep(1)

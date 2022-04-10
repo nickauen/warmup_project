@@ -25,7 +25,7 @@ class Follow(object):
         rospy.sleep(1)
     
     def process_scan(self, data):
-        goal_orientation = 0
+        current_orientation = 0
         angular_constant = 0.8
         goal_distance = 0.3
         angular_speed = 0
@@ -47,11 +47,13 @@ class Follow(object):
         distance = (data.ranges[351] + data.ranges[352] + data.ranges[353] + data.ranges[354] + data.ranges[355] + data.ranges[356] + data.ranges[357] + data.ranges[358] + data.ranges[359] + 
         data.ranges[0] + data.ranges[1] + data.ranges[2] + data.ranges[3] + data.ranges[4] + data.ranges[5] + data.ranges[6] + data.ranges[7] + data.ranges[8] + data.ranges[9])/19
         
-        """if ((current_orientation < 25) or (current_orientation > 330)):
-            angular_speed = 0.0
-            linear_speed = linear_constant*distance"""
+        if (current_orientation != 0):
+            angular_speed = (current_orientation-0)/300
+            if ((current_orientation < 360) and (current_orientation > 180)):
+                angular_speed *= -1/10
+            linear_speed = 0.1
 
-        linear_speed = linear_constant*distance/2
+        """linear_speed = linear_constant*distance/2
         if ((current_orientation <= 25) or (current_orientation >= 340)):
             linear_speed = linear_constant*distance
 
@@ -62,9 +64,7 @@ class Follow(object):
         if ((current_orientation < 350) and (current_orientation > 180)):
             angular_speed = -1*(angular_constant*(1/current_orientation))*500
             
-
-        """if ((current_orientation > 90) and (current_orientation < 270)):
-            linear_speed = 0.0"""
+        """
         
         if(distance <= goal_distance):
             linear_speed = 0.0
