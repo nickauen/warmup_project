@@ -4,6 +4,7 @@
 from math import dist
 from multiprocessing.dummy import current_process
 from operator import indexOf
+from threading import currentThread
 from turtle import distance
 import rospy
 import numpy
@@ -15,88 +16,77 @@ class Follow_Wall(object):
     """ This node published ROS messages to make a turtlebot find a wall and follow it """
 
     def __init__(self):
+        # Initiates the follow_wall node
         rospy.init_node('follow_wall')
-    
+        # Initiates the follow_wall publisher
         self.follow_wall_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
-
+        # Initiates the scan subscriber
         rospy.Subscriber("/scan", LaserScan, self.process_scan)
-
+        # Give time to set up connections
         rospy.sleep(1)
-
+    # Takes in data from the scan topic and turns that data into cmd_vel movements
     def process_scan(self, data):
-        goal_orientation = 90
+        # Goal orientation is 90 (the robot should be parallel from the wall)
+        
+        # Initializing speeds to 0
         linear_speed = 0
         angular_speed = 0
-        angular_variable = 0
-        goal_distance = 0.5
+        # Robot should be close to 0.3 away from wall
+        goal_distance = 0.3
+        #Initialize twist()
         cmd = Twist()
 
+        # Initialize low_value to random number
         low_value = 50
-        index = 0
+        
+        # Iterate through each degree in the scan topic
         for x in range(359):
+            # Find which orientation is closest to the robot
             if ((data.ranges[x] != 0.0) and (data.ranges[x] < low_value)):
-                low_value = data.ranges[x]
-               
-                current_orientation = x
-        
-        side_distance = (data.ranges[81] + data.ranges[82] + data.ranges[83] + data.ranges[84] + data.ranges[85] + data.ranges[86] + data.ranges[87] + data.ranges[88] + data.ranges[89] + 
-        data.ranges[90] + data.ranges[91] + data.ranges[92] + data.ranges[93] + data.ranges[94] + data.ranges[95] + data.ranges[96] + data.ranges[97] + data.ranges[98] + data.ranges[99])/19
+                # For following the wall, we're not interested in directions behind or to the right of the robot
+                if((x < 120) or (x > 320)):
+                    low_value = data.ranges[x]
+                    # Tracks what direction is closest to the robot via LiDAR
+                    current_orientation = x
+                # Tracks what direction is closest outside of specified ranges
+                other_orientation_direction = x
 
-
+        # Averages the distance values from the fron ~20 degrees of the robot to approximate distance from front
+        # Allows robot to stop at walls/corners at specified time
+        # Such a large range of degrees helps to give a more stable value
         front_distance = (data.ranges[351] + data.ranges[352] + data.ranges[353] + data.ranges[354] + data.ranges[355] + data.ranges[356] + data.ranges[357] + data.ranges[358] + data.ranges[359] + 
-        data.ranges[0] + data.ranges[1] + data.ranges[2] + data.ranges[3] + data.ranges[4] + data.ranges[5] + data.ranges[6] + data.ranges[7] + data.ranges[8] + data.ranges[9])/19
-
+        data.ranges[0] + data.ranges[1] + data.ranges[2] + data.ranges[3] + data.ranges[4] + data.ranges[5] + data.ranges[6] + data.ranges[7] + data.ranges[8] + data.ranges[9])/17
         
-
-        if (front_distance <= goal_distance):
-            r = rospy.Rate(5)  
-            for i in range(1):
-                linear_speed = 0.0
-                angular_speed = -0.35
-
-                cmd.linear.x = linear_speed
-                cmd.angular.z = angular_speed
-                   
-                self.follow_wall_pub.publish(cmd)
-                rospy.sleep(0.5)
+        # If there's nothing in front of the robot or the wall if further than 0.3, and it's current orientation is in front
+        # No angular speed, just find a wall
+        if (((front_distance == 0) or (front_distance > goal_distance)) and ((current_orientation < 15) or (current_orientation > 345))):
+            linear_speed = 0.15
+            # Set speeds to variables
+            cmd.linear.x = linear_speed
+            cmd.angular.z = angular_speed
+            self.follow_wall_pub.publish(cmd)
         
+        # If the robot is not aligned with the by a large amount, stop forward movement and fix it
+        elif ((current_orientation < 80) or (other_orientation_direction > 95)):
+            # /80 was found to be a reasonable angular speed
+            angular_speed = (current_orientation-90)/80
+            linear_speed = 0.0
+            # Set speeds to variables
+            cmd.linear.x = linear_speed
+            cmd.angular.z = angular_speed
+            self.follow_wall_pub.publish(cmd)
+
+        # Default -- robot moves forward while adjusting orientation relative to wall
         else:
-            
-            if ((side_distance < 1) and (current_orientation != 90)):
-                linear_speed = 0.15
-                angular_speed = (current_orientation-90)/40
+            # /100 was found to be a reasonable angular speed when moving forward
+            angular_speed = (current_orientation-90)/100
+            linear_speed = 0.2
+            # Set speeds to variables
+            cmd.linear.x = linear_speed
+            cmd.angular.z = angular_speed
+            self.follow_wall_pub.publish(cmd)
 
-                cmd.linear.x = linear_speed
-                cmd.angular.z = angular_speed
-                self.follow_wall_pub.publish(cmd)
-
-            #Default linear speed
-            else: 
-                linear_speed = 0.15
-                angular_speed = 0.0
-                
-                cmd.linear.x = linear_speed
-                cmd.angular.z = angular_speed
-
-                self.follow_wall_pub.publish(cmd)
-
-
-        '''linear_speed = 0.2
-        if ((current_orientation < 15) or (current_orientation > 345)):
-            linear_speed = 0.2*front_distance
-
-        if (front_distance <= goal_distance):
-            linear_speed = 0.01*front_distance
-            if ((current_orientation <= 86) or (current_orientation >= 270)):
-                angular_variable = -1
-            if ((current_orientation >= 94) or (current_orientation < 270)):
-                angular_variable = 1
-       
-        elif ((current_orientation <= 93) and (current_orientation >= 87)):
-                    angular_variable = 0.0
-                    linear_speed = 0.5
-        '''
-        
+    # Run indefinitely
     def run(self):
         rospy.spin()
 
