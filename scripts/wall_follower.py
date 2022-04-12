@@ -59,6 +59,7 @@ class Follow_Wall(object):
         
         # If there's nothing in front of the robot or the wall if further than 0.3, and it's current orientation is in front
         # No angular speed, just find a wall
+        # The robot stops at the goal_distance from the wall
         if (((front_distance == 0) or (front_distance > goal_distance)) and ((current_orientation < 15) or (current_orientation > 345))):
             linear_speed = 0.15
             # Set speeds to variables
@@ -67,6 +68,7 @@ class Follow_Wall(object):
             self.follow_wall_pub.publish(cmd)
         
         # If the robot is not aligned with the by a large amount, stop forward movement and fix it
+        # Allows for robot to round corners
         elif ((current_orientation < 80) or (other_orientation_direction > 95)):
             # /80 was found to be a reasonable angular speed
             angular_speed = (current_orientation-90)/80
