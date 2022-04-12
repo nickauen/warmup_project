@@ -1,3 +1,4 @@
+
 # warmup_project
 
 ## Warmup Project README
@@ -17,16 +18,62 @@
 > much of square as possible.
 
   ![IMG_1055_AdobeCreativeCloudExpress](https://github.com/nickauen/warmup_project/blob/4ae733f9280dc2230b6a6ec2e021539c8b49cbdf/IMG_1055_AdobeCreativeCloudExpress.gif)
-  ![Untitled_AdobeCreativeCloudExpress](https://github.com/nickauen/warmup_project/blob/4ae733f9280dc2230b6a6ec2e021539c8b49cbdf/Untitled_AdobeCreativeCloudExpress.gif)
-  ![RenderedVideo_AdobeCreativeCloudExpress](https://github.com/nickauen/warmup_project/blob/4ae733f9280dc2230b6a6ec2e021539c8b49cbdf/RenderedVideo_AdobeCreativeCloudExpress.gif)
+
+### **PERSON FOLLOWER**
+
+> person_follower.py is a script that makes the turtlebot follow the
+> closest person to it (really the closest *thing* to it). To do this, I
+> scanned the data from the LiDAR sensor using the scan topic and found
+> which direction from the turtlebot the closest person was. Based on
+> this orientation, I calculated the necessary angular velocity to
+> orient the turtlebot *0 degrees* relative to the nearest person. The
+> turtlebot also stops when it reaches a set distance from this person.
+> This script was created with a class object (Follow(object)).  
+> **init**(self) initializes the follow_thing node, the publisher that publishes the twist command, and the subscriber that listens for the
+> scan topic are also initialized.
+> **process_scan** takes in the LiDAR data and iterates through all 360 degrees to find which direction the closest object is relative to the
+> turtlebot. This is then transformed into an angular velocity for the
+> turtlebot. The turtlebot moves forward towards the person while
+> constantly adjusting its orientation relative to them. The distance
+> value is calculated by averaging the values measured in the front ~20
+> degrees of the robot in order to generate a more stable distance
+> measurement.
+
+![Untitled_AdobeCreativeCloudExpress](https://github.com/nickauen/warmup_project/blob/4ae733f9280dc2230b6a6ec2e021539c8b49cbdf/Untitled_AdobeCreativeCloudExpress.gif)
+  
+### **WALL FOLLOWER**
+
+> wall_follower.py is a script that instructs the turtlebot to drive
+> forward until it finds a wall, turn 90 degrees, and then continue to
+> drive forward until it finds a corner and turns, continuing
+> indefinitely. The turtlebot attempts to stay as parallel to the wall
+> as possible while doing this. This script was created with a class
+> object (Follow_Wall(object)).  
+> **init**(self) initializes the follow_wall node, the publisher that publishes the twist command, and the subscriber that listens for the
+> scan topic are also initialized. Similar to that in the
+> person_follower.py code, **process_scan** takes in the LiDAR data and
+> iterates through all 360 degrees to find which direction the closest
+> object is relative to the turtlebot; however, objects that are close
+> but are behind or to the right of the robot are excluded since the
+> robot only needs to see the wall in front of it or to the left of it.
+> All directions around the robot are also tracked in a separate
+> variable (*other_orientation_direction*). The robot first finds a wall
+> and stops a set distance from it. The robot now turns 90 degrees and
+> begins to follow the wall while keeping as close to parallel
+> (*current_orientation = 90*) to the wall. The distance value is
+> calculated by averaging the values measured in the front ~20 degrees
+> of the robot in order to generate a more stable distance measurement.
+
+![RenderedVideo_AdobeCreativeCloudExpress](https://github.com/nickauen/warmup_project/blob/4ae733f9280dc2230b6a6ec2e021539c8b49cbdf/RenderedVideo_AdobeCreativeCloudExpress.gif)
   
 
----
-## README Instructions
-A high-level description (a few sentences): Describe the problem and your approach at a high-level. Include any relevant diagrams or pictures that help to explain your approach.
-Code explanation (a couple of sentences per function): Describe the structure of your code. For the functions you wrote, describe what each of them does.
-A gif: Record a gif of the physical robot performing the behavior. Include this gif in your writeup and use it for analysis if needed.
+### **CHALLENGES**
+I found understanding what state the robot was in relative to the wall or the person to be particularly difficult, and I struggled to find ways to have the robot know whether it should search for a wall, follow a wall, or round a corner since the LiDAR data from all of these scenarios can look similar) . By incorporating both front distance data and LiDAR data (current orientation) I was able to distinguish between states and orientations of the robot relative to its surroundings. This allowed me to create conditions wherein the robot could adjust its linear and angular velocities depending on the scenario.
 
-Challenges (1 paragraph): Describe the challenges you faced programming these robot behaviors and how you overcame them.
-Future work (1 paragraph): If you had more time, how would you improve your robot behaviors?
-Takeaways (at least 2 bullet points with a few sentences per bullet point): What are your key takeaways from this project that would help you/others in future robot programming assignments? For each takeaway, provide a few sentences of elaboration.
+### **FUTURE WORK**
+Some of my solutions for understanding the robot's current state are not as robust as I would like them to be, and it's likely that there are certain scenarios in which the robot would become confused (multiple tight corners, etc.). I would also like to find a way to moderate distance from the wall while following it - my current implementation does a good job staying a set distance from the wall based on orientation alone, but this could be more robust.
+
+### **TAKEAWAYS**
+
+ - The turtlebot can see in all directions (360 degrees) at once. Understand that you may need to exclude certain data to understand the robot's orientation in order to create a cleaner signal from the LiDAR Scanner. Multiple of these directions can also be combined to understand the robot's orientation as well.
+ - Simulation != Reality. The proportional control values vary between simulation and real life which can cause the code that runs perfectly in simulation to fail in reality (and vice versa). Save time to run code *on* the robot.
