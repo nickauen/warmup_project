@@ -60,8 +60,9 @@
 > variable (*other_orientation_direction*). The robot first finds a wall
 > and stops a set distance from it. The robot now turns 90 degrees and
 > begins to follow the wall while keeping as close to parallel
-> (*current_orientation = 90*) to the wall. The distance value is
-> calculated by averaging the values measured in the front ~20 degrees
+> (*current_orientation = 90*) to the wall as possible. By stopping the goal_distance from the wall and staying parallel, 
+> the distance from the robot to the wall is kept constant.
+> The distance value is calculated by averaging the values measured in the front ~20 degrees
 > of the robot in order to generate a more stable distance measurement.
 
 ![RenderedVideo_AdobeCreativeCloudExpress](https://github.com/nickauen/warmup_project/blob/4ae733f9280dc2230b6a6ec2e021539c8b49cbdf/RenderedVideo_AdobeCreativeCloudExpress.gif)
@@ -71,7 +72,7 @@
 I found understanding what state the robot was in relative to the wall or the person to be particularly difficult, and I struggled to find ways to have the robot know whether it should search for a wall, follow a wall, or round a corner since the LiDAR data from all of these scenarios can look similar) . By incorporating both front distance data and LiDAR data (current orientation) I was able to distinguish between states and orientations of the robot relative to its surroundings. This allowed me to create conditions wherein the robot could adjust its linear and angular velocities depending on the scenario.
 
 ### **FUTURE WORK**
-Some of my solutions for understanding the robot's current state are not as robust as I would like them to be, and it's likely that there are certain scenarios in which the robot would become confused (multiple tight corners, etc.). I would also like to find a way to moderate distance from the wall while following it - my current implementation does a good job staying a set distance from the wall based on orientation alone, but this could be more robust.
+Some of my solutions for understanding the robot's current state are not as robust as I would like them to be, and it's likely that there are certain scenarios in which the robot would become confused (multiple tight corners, etc.). I would like to better be able to recognize people in front of the robot. My current implementation often becomes confused when looking at two legs of a person (since there's a gap in the middle) - my LiDAR "seeing" implementation could be more robust with regards to this.
 
 ### **TAKEAWAYS**
 
