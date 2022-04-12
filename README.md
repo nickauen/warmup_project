@@ -16,7 +16,10 @@
 > angular.z values were adjusted to get the turtlebot to drive in as
 > much of square as possible.
 
-  ![ezgif-4-3050593917](https://user-images.githubusercontent.com/102747072/161753490-9fe40fa6-f2b1-4357-807d-7da3c5a33703.gif)
+  ![IMG_1055_AdobeCreativeCloudExpress](https://github.com/nickauen/warmup_project/blob/4ae733f9280dc2230b6a6ec2e021539c8b49cbdf/IMG_1055_AdobeCreativeCloudExpress.gif)
+  ![Untitled_AdobeCreativeCloudExpress](https://github.com/nickauen/warmup_project/blob/4ae733f9280dc2230b6a6ec2e021539c8b49cbdf/Untitled_AdobeCreativeCloudExpress.gif)
+  ![RenderedVideo_AdobeCreativeCloudExpress](https://github.com/nickauen/warmup_project/blob/4ae733f9280dc2230b6a6ec2e021539c8b49cbdf/RenderedVideo_AdobeCreativeCloudExpress.gif)
+  
 
 ---
 ## README Instructions
